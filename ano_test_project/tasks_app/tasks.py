@@ -4,6 +4,7 @@ import random
 
 from src.celery import app
 from celery.utils.log import get_task_logger
+from celery import shared_task
 
 from .models import Task
 
@@ -11,7 +12,8 @@ from .models import Task
 logger = get_task_logger(__name__)
 
 
-@app.task
+# @app.task
+@shared_task
 def handle_task(task_id: int) -> None:
     # 1. Получение задачи из очереди
     task: Task = Task.objects.get(id=task_id)
