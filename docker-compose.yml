@@ -1,0 +1,106 @@
+
+
+networks:
+  ano_test_network:
+
+services:
+
+  # === DATABASE ===
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - ${DB_CONT_PORT}:5432
+    environment:
+      # Superuser username/password
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - "01-ano-test-postgres:/var/lib/postgresql/data"
+    networks:
+      - ano_test_network
+    env_file:
+      - .env
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: a@a.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+    volumes:
+      - "01-ano-test-pgadmin:/var/lib/pgadmin"
+    depends_on:
+      - postgres
+    networks:
+      - ano_test_network
+    env_file:
+      - .env
+
+  # === DJANGO ===
+  django:
+    build:
+      context: ./ano_test_project
+      dockerfile: Dockerfile
+    volumes:
+      - ./ano_test_project:/usr/src/app
+      - static_volume:/app/static  # Для использования в nginx
+    restart: unless-stopped
+    container_name: django
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - ano_test_network
+
+  # === CELERY ===
+  # -- REDIS
+#  redis:
+#    image: redis:alpine
+#    container_name: redis
+#    ports:
+#      - ${REDIS_PORT}:6379
+#    restart: unless-stopped
+#    networks:
+#      - ano_test_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  # -- CELERY WORKER
+  celery_worker:
+    build:
+      context: ./ano_test_project
+      dockerfile: Dockerfile
+    volumes:
+      - ./ano_test_project:/usr/src/app
+      - static_volume:/app/static  # Для использования в nginx
+    restart: unless-stopped
+    container_name: celery_worker
+    command: celery -A src worker --loglevel=INFO --concurrency=1
+    depends_on:
+#      - redis
+      - rabbitmq
+      - django
+    env_file:
+      - .env
+    networks:
+      - ano_test_network
+
+
+volumes:
+  01-ano-test-postgres:
+  01-ano-test-pgadmin:
+  static_volume:
