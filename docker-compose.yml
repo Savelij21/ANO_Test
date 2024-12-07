@@ -52,7 +52,7 @@ services:
       - static_volume:/app/static  # Для использования в nginx
     restart: unless-stopped
     container_name: django
-    command: gunicorn -c gunicorn_config.py src.wsgi:application
+    command: bash -c "python manage.py migrate && gunicorn -c gunicorn_config.py src.wsgi:application"
     ports:
       - 8000:8000
     depends_on:
