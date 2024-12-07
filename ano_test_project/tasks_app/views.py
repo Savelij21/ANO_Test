@@ -1,4 +1,6 @@
 import logging
+
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,7 +24,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def create_task(self, request, *args, **kwargs):
         """
-        Метод для создания новой задачи
+        Создание новой задачи
         """
         # -- создание новой задачи в БД
         new_task = Task.objects.create(
@@ -37,13 +39,25 @@ class TaskViewSet(viewsets.ModelViewSet):
             status=201
         )
 
+    @extend_schema(parameters=[OpenApiParameter(
+                name='status',
+                description="Фильтрация по статусу [1, 2, 3, 4]",
+                required=False,
+                type=int,
+            )])
     def list(self, request, *args, **kwargs):
         """
-        Метод для получения списка всех задач (с возможностью фильтрации через query параметр status)
+        Получение списка всех задач (с возможностью фильтрации через query параметр status)
         """
         status_filter = request.query_params.get('status', None)
         if status_filter:
             self.queryset = self.queryset.filter(status=int(status_filter))
 
         return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Получение информации о задаче по идентификатору
+        """
+        return super().retrieve(request, *args, **kwargs)
 

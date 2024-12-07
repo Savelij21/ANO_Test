@@ -151,8 +151,6 @@ REST_FRAMEWORK = {
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1',
     'http://localhost',
-    f'http://127.0.0.1:{os.getenv("NGINX_EXTERNAL_PORT")}',
-    f'http://localhost:{os.getenv("NGINX_EXTERNAL_PORT")}'
 ]
 
 
@@ -230,7 +228,6 @@ LOGGING = {
 
 CELERY_BROKER_URL = (f'amqp://{os.getenv("RABBITMQ_DEFAULT_USER")}:{os.getenv("RABBITMQ_DEFAULT_PASS")}@'
                      f'{os.getenv("RABBITMQ_HOST")}:5672/')
-# CELERY_RESULT_BACKEND = 'rpc://'
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
