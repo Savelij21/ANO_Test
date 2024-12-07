@@ -41,7 +41,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @extend_schema(parameters=[OpenApiParameter(
                 name='status',
-                description="Фильтрация по статусу [1, 2, 3, 4]",
+                description="Фильтрация по статусу (new, in_progress, success, error)",
                 required=False,
                 type=int,
             )])
@@ -51,7 +51,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         """
         status_filter = request.query_params.get('status', None)
         if status_filter:
-            self.queryset = self.queryset.filter(status=int(status_filter))
+            self.queryset = self.queryset.filter(status__filter_name=status_filter)
 
         return super().list(request, *args, **kwargs)
 

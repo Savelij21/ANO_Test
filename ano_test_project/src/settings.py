@@ -93,6 +93,8 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
+        # 'HOST': 'localhost',
+        # 'PORT': '5433',
         # 'ATOMIC_REQUESTS': True,
     }
 }

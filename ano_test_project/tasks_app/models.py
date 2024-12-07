@@ -8,6 +8,7 @@ class Status(models.Model):
     Модель статусов для задачи
     """
     name = models.CharField(max_length=30, unique=True)
+    filter_name = models.CharField(max_length=30, unique=True)
 
 
 class Task(models.Model):
