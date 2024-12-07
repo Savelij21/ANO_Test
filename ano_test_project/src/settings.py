@@ -228,7 +228,8 @@ LOGGING = {
 
 # CELERY
 
-CELERY_BROKER_URL = 'amqp://guest@rabbitmq:5672//'
+CELERY_BROKER_URL = (f'amqp://{os.getenv("RABBITMQ_DEFAULT_USER")}:{os.getenv("RABBITMQ_DEFAULT_PASS")}@'
+                     f'{os.getenv("RABBITMQ_HOST")}:5672/')
 # CELERY_RESULT_BACKEND = 'rpc://'
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}

@@ -52,7 +52,7 @@ services:
       - static_volume:/app/static  # Для использования в nginx
     restart: unless-stopped
     container_name: django
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn -c gunicorn_config.py src.wsgi:application
     ports:
       - 8000:8000
     depends_on:
@@ -63,15 +63,6 @@ services:
       - ano_test_network
 
   # === CELERY ===
-  # -- REDIS
-#  redis:
-#    image: redis:alpine
-#    container_name: redis
-#    ports:
-#      - ${REDIS_PORT}:6379
-#    restart: unless-stopped
-#    networks:
-#      - ano_test_network
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -79,6 +70,9 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
 
   # -- CELERY WORKER
   celery_worker:
