@@ -43,7 +43,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                 name='status',
                 description="Фильтрация по статусу (new, in_progress, success, error)",
                 required=False,
-                type=int,
+                type=str,
             )])
     def list(self, request, *args, **kwargs):
         """
